@@ -1,6 +1,4 @@
-# bootstrap-semester or maybe bootstrap-term-project
-
-Automation tool to prepare for the new semester.
+# A Manangement System
 
 ## Design
 
@@ -16,5 +14,5 @@ Automation tool to prepare for the new semester.
 - User give a team information. The software automatically creates MS Teams channel with proper slug.
   The software creates team on GitHub Organization.
   
-Note that the current flow is to reuse a channel. Additional channels are then created once the
-existing channels are used up.
+  Note that the current flow is to reuse a channel. Additional channels are then created once the
+  existing channels are used up.
