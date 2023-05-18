@@ -17,6 +17,29 @@ def in_memory_engine_with_tables():
     return engine
 
 
+@pytest.fixture
+def a_classroom():
+    return Classroom(
+        name="cs3560-s22-23",
+        begin_date=datetime(year=2023, month=1, day=10),
+        end_date=datetime(year=2023, month=5, day=5),
+    )
+
+
+@pytest.fixture
+def list_of_students(a_classroom):
+    result = [
+        Student(
+            first_name="Bob",
+            last_name="Cat",
+            username="bobcat",
+            github_username="bobcat",
+            classroom=a_classroom,
+        )
+    ]
+    return result
+
+
 class TestClassroom:
     def test_creation(self, in_memory_engine_with_tables):
         with Session(in_memory_engine_with_tables) as session:
@@ -35,3 +58,47 @@ class TestClassroom:
                 )
                 session.add(c)
                 session.commit()
+
+
+class TestStudentModel:
+    def test_creation(self, in_memory_engine_with_tables, a_classroom):
+        with Session(in_memory_engine_with_tables) as session:
+            session.add(a_classroom)
+            session.commit()
+
+            # Minimal student creation.
+            # without github username and team
+            s = Student(
+                first_name="Bob",
+                last_name="Cat",
+                username="bobcat",
+                classroom=a_classroom,
+            )
+            session.add(s)
+            session.commit()
+
+            s = Student(
+                first_name="Bob",
+                last_name="Cat",
+                username="bobcat",
+                github_username="bobcat",
+                classroom=a_classroom,
+            )
+            session.add(s)
+            session.commit()
+
+
+class TestMilestoneModel:
+    def test_milestone(self, in_memory_engine_with_tables, a_classroom):
+        with Session(in_memory_engine_with_tables) as session:
+            session.add(a_classroom)
+            session.commit()
+
+            m = Milestone(
+                name="Checkpoint 1",
+                begin_date=datetime(year=2023, month=1, day=1),
+                end_date=datetime(year=2023, month=1, day=14),
+                classroom=a_classroom,
+            )
+            session.add(m)
+            session.commit()

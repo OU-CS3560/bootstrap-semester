@@ -37,13 +37,14 @@ class Student(Base):
     last_name: Mapped[str] = mapped_column(String(256))
     username: Mapped[str] = mapped_column(String(256))
     github_username: Mapped[Optional[str]] = mapped_column(String(256))
-    is_drop: Mapped[bool] = mapped_column(Boolean())
+    is_drop: Mapped[bool] = mapped_column(Boolean(), default=False)
+    note: Mapped[str] = mapped_column(Text(), default="")
 
     classroom_id: Mapped[int] = mapped_column(ForeignKey("classroom.id"))
     classroom: Mapped["Classroom"] = relationship(back_populates="students")
 
-    team_id: Mapped[int] = mapped_column(ForeignKey("team.id"))
-    team: Mapped["Team"] = relationship(back_populates="members")
+    team_id: Mapped[Optional[int]] = mapped_column(ForeignKey("team.id"))
+    team: Mapped[Optional["Team"]] = relationship(back_populates="members")
 
 
 class Milestone(Base):
