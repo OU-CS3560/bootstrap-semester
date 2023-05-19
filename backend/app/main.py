@@ -2,10 +2,11 @@ from typing import Union
 
 from fastapi import FastAPI, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseSettings
 
 from . import crud
+from .config import settings
 from .schemas import MembershipResultBase, ClassroomCreate
-from .models import Base
 from .db import SessionLocal, engine
 
 
@@ -22,9 +23,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
-    # FIXME(KC): Use alembic instead.
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    pass
 
 
 @app.on_event("shutdown")

@@ -9,7 +9,7 @@ $ uvicorn app.main:app --reload
 ## Run tests
 
 ```console
-$ rm -f test.db; PYTHONPATH=. pytest
+$ rm -f test.db; ./scripts/test.sh
 ```
 
 ## Endpoint Testing Commands
