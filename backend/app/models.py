@@ -5,9 +5,10 @@ from sqlalchemy import Integer, String, Table, ForeignKey, Boolean, DateTime, Te
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.asyncio import AsyncAttrs
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 

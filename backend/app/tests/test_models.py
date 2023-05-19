@@ -1,4 +1,9 @@
-"""Test cases for simple model creation and usage."""
+"""
+Test cases for simple model creation and usage.
+
+These tests directly interact with the models and not
+does not deal with the app's endpoints.
+"""
 from datetime import datetime
 
 import pytest

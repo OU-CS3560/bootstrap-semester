@@ -1,18 +1,22 @@
 """Collection of Create, Read, Update and Delete Operations."""
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import schemas
 from . import models
 
 
-def create_classroom(db: Session, classroom: schemas.ClassroomCreate):
+async def create_classroom(db: AsyncSession, classroom: schemas.ClassroomCreate):
     classroom_data = classroom.dict()
     db_obj = models.Classroom(**classroom_data)
     db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
+    await db.commit()
+    await db.refresh(db_obj)
     return db_obj
 
 
-def get_classrooms(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Classroom).offset(skip).limit(limit).all()
+async def get_classrooms(db: AsyncSession, skip: int = 0, limit: int = 100):
+    query = select(models.Classroom).offset(skip).limit(limit)
+    results = await db.execute(query)
+    rows = results.scalars().all()
+    return rows

@@ -1,8 +1,7 @@
 from typing import Union
-from datetime import datetime
 
 from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import crud
 from .schemas import MembershipResultBase, ClassroomCreate
@@ -10,17 +9,27 @@ from .models import Base
 from .db import SessionLocal, engine
 
 
-def get_db_session():
+async def get_db() -> AsyncSession:
     try:
         db = SessionLocal()
         yield db
     finally:
-        db.close()
+        await db.close()
 
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
+@app.on_event("startup")
+async def startup():
+    # FIXME(KC): Use alembic instead.
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await engine.dispose()
 
 
 @app.get("/")
@@ -35,21 +44,21 @@ async def read_item(item_id: int, q: Union[str, None]):
 
 @app.get("/classrooms/")
 async def get_classrooms(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db_session)
+    skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
 ):
-    return crud.get_classrooms(db, skip, limit)
+    return await crud.get_classrooms(db, skip, limit)
 
 
 @app.post("/classrooms/")
 async def create_classroom(
-    classroom: ClassroomCreate, db: Session = Depends(get_db_session)
+    classroom: ClassroomCreate, db: AsyncSession = Depends(get_db)
 ):
-    db_obj = crud.create_classroom(db, classroom)
+    db_obj = await crud.create_classroom(db, classroom)
     return db_obj
 
 
 @app.post("/students/import")
 async def import_students(
-    membership_results: MembershipResultBase, db: Session = Depends(get_db_session)
+    membership_results: MembershipResultBase, db: AsyncSession = Depends(get_db)
 ):
     pass
