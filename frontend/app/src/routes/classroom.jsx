@@ -76,7 +76,7 @@ export default function Classroom() {
             {classroom.teams &&
               classroom.teams.map((team, index) => (
                 <li key={index}>
-                  <a href={`/team/${team.id}`}>{team.name}</a>
+                  <a href={`/teams/${team.id}`}>{team.name}</a>
                 </li>
               ))}
           </ul>
