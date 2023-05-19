@@ -1,6 +1,7 @@
 version: '3.8'
 
 x-common-variables: &common-variables
+  SQLALCHEMY_DATABASE_URL: "sqlite+aiosqlite:///:memory:"
   MYSQL_DATABASE: books
   MYSQL_USER: MYSQL_USER
   MYSQL_PASSWORD: MYSQL_PASSWORD
@@ -13,4 +14,13 @@ services:
       dockerfile: Dockerfile
       context: ./frontend
     ports:
-      - "3000:80"
+      - "80:80"
+
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+    ports:
+      - "3001:80"
+    environment:
+      <<: *common-variables

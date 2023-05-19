@@ -14,6 +14,8 @@ $ rm -f test.db; PYTHONPATH=. pytest
 
 ## Endpoint Testing Commands
 
+Use the interactive API docs at `/docs` or curl.
+
 ```console
 curl -X POST http://localhost:8000/classrooms/ \
   -H "Content-Type: application/json" \
