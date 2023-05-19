@@ -1,6 +1,13 @@
 # Frontend
 
+The client-side of the system. The containerized version also
+host the Nginx to serve the static files and act as a reverse proxy
+for the API.
+
 ## Local Development
+
+Copy `app/.env.sample` as `app/.env.development.local` and fill in the correct value
+for `VITE_API_BASE_URL`.
 
 ```console
 $ cd app

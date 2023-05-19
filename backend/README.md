@@ -2,9 +2,21 @@
 
 ## Local Development
 
+Copy `.env.sample` as `.env` and fill in the value for the variables. Then, run
+
 ```console
-$ uvicorn app.main:app --reload
+$ export $(cat .env)
 ```
+
+The development server can then be started with
+
+```console
+$ python -m uvicorn app.main:app --host 0.0.0.0 --port 3000
+```
+
+(Note that the `./scripts/start.sh` is tightly coupled with the container).
+
+To unset the variable use the `unset NAME` command.
 
 ## Run tests
 
