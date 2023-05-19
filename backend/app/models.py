@@ -37,6 +37,7 @@ class Student(Base):
     last_name: Mapped[str] = mapped_column(String(256))
     username: Mapped[str] = mapped_column(String(256))
     github_username: Mapped[Optional[str]] = mapped_column(String(256))
+    codewars_username: Mapped[Optional[str]] = mapped_column(String(256))
     is_drop: Mapped[bool] = mapped_column(Boolean(), default=False)
     note: Mapped[str] = mapped_column(Text(), default="")
 
