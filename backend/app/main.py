@@ -71,8 +71,18 @@ async def create_classroom(
     return db_obj
 
 
-@app.post("/students/import")
-async def import_students(
-    membership_results: MembershipResultBase, db: AsyncSession = Depends(get_db)
+@app.get("/classrooms/{classroom_id}")
+async def get_classrooms(
+    classroom_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    return await crud.get_classroom(db, classroom_id)
+
+
+@app.get("/classrooms/{classroom_id}/import/students-from-bb")
+async def import_students_from_bb(
+    classroom_id: int,
+    membership_results: MembershipResultBase,
+    db: AsyncSession = Depends(get_db),
 ):
     pass

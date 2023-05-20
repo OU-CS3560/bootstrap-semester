@@ -20,3 +20,10 @@ async def get_classrooms(db: AsyncSession, skip: int = 0, limit: int = 100):
     results = await db.execute(query)
     rows = results.scalars().all()
     return rows
+
+
+async def get_classroom(db: AsyncSession, classroom_id: int):
+    query = select(models.Classroom).where(models.Classroom.id == classroom_id)
+    results = await db.execute(query)
+    classroom = results.scalars().one()
+    return classroom

@@ -3,10 +3,23 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App.jsx";
-import Classroom from "./routes/Classroom.jsx";
+import ClassroomDetail from "./routes/ClassroomDetail.jsx";
 import ClassroomList from "./routes/ClassroomList.jsx";
-import Team from "./routes/Team.jsx";
+import TeamDetail from "./routes/TeamDetail.jsx";
 import ErrorPage from "./ErrorPage.jsx";
+
+import { getClassrooms, getClassroom } from "./api/classrooms.js";
+
+async function classroomsLoader() {
+  const classrooms = await getClassrooms();
+  return { classrooms };
+}
+
+async function classroomLoader({ params }) {
+  console.log(params);
+  const classroom = await getClassroom(params.classroomId);
+  return { classroom };
+}
 
 const router = createBrowserRouter([
   {
@@ -20,15 +33,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/classrooms/",
+    loader: classroomsLoader,
     element: <ClassroomList />,
   },
   {
-    path: "/classrooms/:classromId",
-    element: <Classroom />,
+    path: "/classrooms/:classroomId",
+    loader: classroomLoader,
+    element: <ClassroomDetail />,
   },
   {
     path: "/teams/:teamId",
-    element: <Team />,
+    element: <TeamDetail />,
   },
 ]);
 
