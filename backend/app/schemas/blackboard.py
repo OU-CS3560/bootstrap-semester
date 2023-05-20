@@ -6,7 +6,7 @@ fields, but the API will return more data.
 from pydantic import BaseModel, Extra
 
 
-class NameBase(BaseModel):
+class Name(BaseModel):
     given: str
     family: str
 
@@ -14,19 +14,19 @@ class NameBase(BaseModel):
         extra = Extra.allow
 
 
-class UserBase(BaseModel):
+class User(BaseModel):
     # We trust that userName is the OU email address handle.
     userName: str
-    name: NameBase
+    name: Name
 
     class Config:
         extra = Extra.allow
 
 
-class MembershipItemBase(BaseModel):
+class MembershipItem(BaseModel):
     id: str
     userId: str
-    user: UserBase
+    user: User
     courseRoleId: str
 
     class Config:
@@ -34,8 +34,8 @@ class MembershipItemBase(BaseModel):
 
 
 # The result return from Blackboard API.
-class MembershipResultBase(BaseModel):
-    results: list[MembershipItemBase]
+class MembershipResult(BaseModel):
+    results: list[MembershipItem]
 
     class Config:
         extra = Extra.allow

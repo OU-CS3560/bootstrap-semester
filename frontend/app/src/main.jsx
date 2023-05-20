@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import ClassroomDetail from "./routes/ClassroomDetail.jsx";
 import ClassroomList from "./routes/ClassroomList.jsx";
 import TeamDetail from "./routes/TeamDetail.jsx";
+import ImportStudentsFromBlackboard from "./routes/ImportStudentsFromBlackboard.jsx";
 import ErrorPage from "./ErrorPage.jsx";
 
 import { getClassrooms, getClassroom } from "./api/classrooms.js";
@@ -16,7 +17,6 @@ async function classroomsLoader() {
 }
 
 async function classroomLoader({ params }) {
-  console.log(params);
   const classroom = await getClassroom(params.classroomId);
   return { classroom };
 }
@@ -40,6 +40,11 @@ const router = createBrowserRouter([
     path: "/classrooms/:classroomId",
     loader: classroomLoader,
     element: <ClassroomDetail />,
+  },
+  {
+    path: "/classrooms/:classroomId/import/students-from-bb",
+    loader: classroomLoader,
+    element: <ImportStudentsFromBlackboard />,
   },
   {
     path: "/teams/:teamId",

@@ -1,6 +1,6 @@
 import os
-import asyncio
 
+from fastapi import status
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -17,11 +17,13 @@ from ..main import app, get_db
 
 @pytest.fixture
 def anyio_backend():
+    """A fixture for tests that are going to access the database layer directly."""
     return "asyncio"
 
 
 @pytest.fixture
 def context():
+    """The context for a test case (test client, DB engine, DB session maker)."""
     engine = create_async_engine(
         SQLALCHEMY_DATABASE_URL,
         echo=False,
@@ -85,7 +87,7 @@ def classroom_api_data():
 def test_get_index(context):
     client, _, _ = context
     response = client.get("/")
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {"hello": "world"}
 
 
@@ -93,7 +95,7 @@ class TestClassroomCRUD:
     def test_list_empty(self, context):
         client, _, _ = context
         response = client.get("/classrooms/")
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
 
     def test_list(self, context, classroom_create_data, classroom_api_data):
@@ -104,7 +106,7 @@ class TestClassroomCRUD:
         )
 
         response = client.get("/classrooms/")
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == [classroom_api_data]
 
     def test_create(self, context, classroom_create_data, classroom_api_data):
@@ -114,26 +116,34 @@ class TestClassroomCRUD:
             json=classroom_create_data,
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == classroom_api_data
 
     def test_get(self, context, classroom_create_data, classroom_api_data):
         client, _, _ = context
+
+        # Create the object to perform get later.
         response = client.post("/classrooms/", json=classroom_create_data)
         classroom_id = response.json()["id"]
-        response = client.get(f"/classrooms/{classroom_id}")
 
-        assert response.status_code == 200
+        # Test.
+        response = client.get(f"/classrooms/{classroom_id}")
+        assert response.status_code == status.HTTP_200_OK
         obj = response.json()
         assert obj["id"] == 1
         assert obj == classroom_api_data
 
+    def test_get_not_exist(self, context):
+        client, _, _ = context
+        response = client.get(f"/classrooms/1")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
     @pytest.mark.anyio
-    @pytest.mark.xfail(reason="not yet implemented")
     async def test_import_bb_students(
         self, anyio_backend, context, classroom_create_data
     ):
-        client, engine, TestingSessionLocal = context
+        client, _, TestingSessionLocal = context
+
         # Create a classroom.
         response = client.post(
             "/classrooms/",
@@ -227,6 +237,9 @@ class TestClassroomCRUD:
                 ]
             },
         )
+
+        # print(response.content)
+        assert response.status_code == status.HTTP_200_OK
 
         # Test by checking DB directly.
         async with TestingSessionLocal() as session:

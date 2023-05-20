@@ -1,2 +1,2 @@
 from .classroom import ClassroomCreate
-from .blackboard import MembershipResultBase
+from .blackboard import MembershipResult

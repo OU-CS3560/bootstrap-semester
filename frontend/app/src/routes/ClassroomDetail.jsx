@@ -28,9 +28,11 @@ export default function ClassroomDetail() {
       </Row>
       <Row>
         <Col xs={3}>
-          <Button variant="outline-primary">
-            Import Student List from Blackboard
-          </Button>
+          <Link to={`import/students-from-bb`}>
+            <Button variant="outline-primary">
+              Import Student List from Blackboard
+            </Button>
+          </Link>
         </Col>
       </Row>
       <Row>
