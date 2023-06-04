@@ -7,8 +7,7 @@ Copy `.env.sample` as `.env` and fill in the value for the variables.
 The development server can then be started with
 
 ```console
-$ export $(cat .env)
-$ python -m uvicorn app.main:app --host 0.0.0.0 --port 3000
+$ ./scripts/start-local.sh
 ```
 
 (Note that the `./scripts/start.sh` is tightly coupled with the container).
@@ -43,4 +42,28 @@ $ sqlite3 filename
 > select * from student;
 > ...
 > .q
+```
+
+### Create database migration revision
+
+Create a revision.
+
+```console
+$ alembic revision --autogenerate -m "change type of datetime"
+```
+
+The `--autogenerate` can fail, so be sure to double check the generated file.
+
+Upgrade the database to a revision `<id>`.
+
+```console
+$ alembic upgrade <id>
+```
+
+Use `--sql` to create "offline migration" (an sql file).
+
+Resetting the database.
+
+```console
+$ alembic downgrade base
 ```

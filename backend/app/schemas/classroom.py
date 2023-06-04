@@ -29,8 +29,8 @@ class ClassroomCreate(ClassroomBase):
 
 class ClassroomUpdate(ClassroomBase):
     name: str | None = None
-    begin_date: datetime | None = None
-    end_date: datetime | None = None
+    begin_date: date | None = None
+    end_date: date | None = None
     github_classroom_link: HttpUrl | None = None
 
 
