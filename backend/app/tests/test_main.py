@@ -68,8 +68,8 @@ def context():
 def classroom_create_data():
     return {
         "name": "CS3560 Spring 2022-2023",
-        "begin_date": "2023-01-01T00:00-0400",
-        "end_date": "2023-05-05T00:00-0400",
+        "begin_date": "2023-01-01",
+        "end_date": "2023-05-05",
     }
 
 
@@ -77,9 +77,9 @@ def classroom_create_data():
 def classroom_api_data():
     return {
         "id": 1,
-        "end_date": "2023-05-05T00:00:00",
+        "end_date": "2023-05-05",
         "name": "CS3560 Spring 2022-2023",
-        "begin_date": "2023-01-01T00:00:00",
+        "begin_date": "2023-01-01",
         "github_classroom_link": None,
     }
 
@@ -104,6 +104,7 @@ class TestClassroomCRUD:
             "/classrooms/",
             json=classroom_create_data,
         )
+        assert response.status_code == status.HTTP_201_CREATED
 
         response = client.get("/classrooms/")
         assert response.status_code == status.HTTP_200_OK
@@ -115,6 +116,7 @@ class TestClassroomCRUD:
             "/classrooms/",
             json=classroom_create_data,
         )
+        print(response.json())
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == classroom_api_data
@@ -250,3 +252,18 @@ class TestClassroomCRUD:
             students = results.scalars().all()
 
             assert len(students) == 1
+
+
+class TestStudentCRUD:
+    def test_get_students_not_exist(self, context):
+        client, _, _ = context
+
+        response = client.get("/classrooms/1/students/1")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_list_students_not_exist(self, context):
+        client, _, _ = context
+
+        response = client.get("/classrooms/1/students")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == list()

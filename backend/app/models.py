@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import List, Optional
 
-from sqlalchemy import Integer, String, Table, ForeignKey, Boolean, DateTime, Text
+from sqlalchemy import Integer, String, Table, ForeignKey, Boolean, DateTime, Date, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from sqlalchemy.orm import DeclarativeBase
@@ -22,8 +22,8 @@ class Classroom(Base):
     __tablename__ = "classroom"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(256))
-    begin_date: Mapped[datetime] = mapped_column(DateTime())
-    end_date: Mapped[datetime] = mapped_column(DateTime())
+    begin_date: Mapped[date] = mapped_column(Date())
+    end_date: Mapped[date] = mapped_column(Date())
     github_classroom_link: Mapped[Optional[str]] = mapped_column(String(2048))
 
     students: Mapped[list["Student"]] = relationship()

@@ -5,6 +5,6 @@ from app.models import *
 
 if __name__ == "__main__":
     engine = create_engine("sqlite+pysqlite:///./backend.copy.db", echo=True)
-    Base.metadata.create_all(bind=engine)
+    # Base.metadata.create_all(bind=engine)
 
     session = Session(engine)

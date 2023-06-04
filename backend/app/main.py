@@ -21,6 +21,9 @@ async def get_db() -> AsyncSession:
 
 
 app = FastAPI()
+# During the development mode, the fronetend is served by
+# vite on port 5173. It also seems to prioritize
+# the IPv6 on a machine that has it.
 origins = [
     "http://localhost",
     "http://127.0.0.1",
@@ -107,3 +110,20 @@ async def import_students_from_bb(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Classroom (with id={classroom_id}) not found. You are attempting to import students into non-existent Classroom",
         )
+
+
+@app.get("/classrooms/{classroom_id}/students")
+async def get_students(
+    classroom_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    return await crud.get_students(db, classroom_id)
+
+
+@app.get("/classrooms/{classroom_id}/students/{student_id}")
+async def get_student(
+    classroom_id: int,
+    student_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    return await crud.get_student(db, classroom_id, student_id)

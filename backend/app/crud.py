@@ -1,5 +1,5 @@
 """Collection of Create, Read, Update and Delete Operations."""
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import schemas
@@ -54,3 +54,22 @@ async def import_students_bb(
     db.add_all(db_objs)
     await db.commit()
     return {"count": len(db_objs)}
+
+
+async def get_students(db: AsyncSession, classroom_id: int):
+    query = select(models.Student).where(models.Student.classroom_id == classroom_id)
+    results = await db.execute(query)
+    students = results.scalars().all()
+    return students
+
+
+async def get_student(db: AsyncSession, classroom_id: int, student_id: int):
+    query = select(models.Student).where(
+        and_(
+            models.Student.id == student_id,
+            models.Student.classroom_id == classroom_id,
+        )
+    )
+    results = await db.execute(query)
+    student = results.scalars().one()
+    return student
