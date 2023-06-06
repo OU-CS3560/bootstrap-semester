@@ -5,6 +5,8 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
+import TopBar from "../components/TopBar";
+
 export default function ClassroomList() {
   const { classrooms } = useLoaderData();
 
@@ -15,8 +17,10 @@ export default function ClassroomList() {
           <Link to={`${classroom.id}`}>{classroom.name}</Link>
         </h3>
         <p>
-          Begin: {new Date(classroom.begin_date).toDateString()} End:{" "}
-          {new Date(classroom.end_date).toDateString()}
+          Begin: {new Date(classroom.begin_date).toDateString()}
+        </p>
+        <p>
+          End: {new Date(classroom.end_date).toDateString()}
         </p>
         <a
           href={classroom.github_classroom_link}
@@ -29,8 +33,9 @@ export default function ClassroomList() {
     </Row>
   ));
 
-  return (
-    <Container fluid>
+  return (<>
+    <TopBar />
+    <Container>
       <Row>
         <Col>
           <h1>Classrooms</h1>
@@ -41,5 +46,5 @@ export default function ClassroomList() {
       </Row>
       {classroomElements}
     </Container>
-  );
+  </>);
 }

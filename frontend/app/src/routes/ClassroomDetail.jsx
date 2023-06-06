@@ -6,11 +6,15 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
 
+import TopBar from "../components/TopBar";
+
 export default function ClassroomDetail() {
   const { classroom } = useLoaderData();
 
   return (
-    <Container fluid>
+    <>
+    <TopBar />
+    <Container>
       <Row>
         <Col>
           <h1>{classroom.name}</h1>
@@ -98,5 +102,5 @@ export default function ClassroomDetail() {
         </Col>
       </Row>
     </Container>
-  );
+  </>);
 }

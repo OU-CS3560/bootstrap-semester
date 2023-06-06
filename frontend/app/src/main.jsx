@@ -39,6 +39,7 @@ const router = createBrowserRouter([
     path: "/classrooms/",
     loader: classroomsLoader,
     element: <ClassroomList />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/classrooms/new",
@@ -49,6 +50,7 @@ const router = createBrowserRouter([
     path: "/classrooms/:classroomId",
     loader: classroomLoader,
     element: <ClassroomDetail />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/classrooms/:classroomId/import/students-from-bb",
