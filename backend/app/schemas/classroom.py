@@ -28,10 +28,16 @@ class ClassroomCreate(ClassroomBase):
 
 
 class ClassroomUpdate(ClassroomBase):
-    name: str | None = None
-    begin_date: date | None = None
-    end_date: date | None = None
-    github_classroom_link: HttpUrl | None = None
+    name: str
+    begin_date: date
+    end_date: date
+    github_classroom_link: Optional[HttpUrl] = None
+
+    @validator("github_classroom_link", pre=True, always=False)
+    def validate_github_classroom_link(cls, val):
+        if val == "":
+            return None
+        return val
 
 
 # Common properties for both DB and API.

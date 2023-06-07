@@ -8,7 +8,7 @@ from sqlalchemy.exc import NoResultFound
 
 from . import crud
 from .config import settings
-from .schemas import MembershipResult, ClassroomCreate
+from .schemas import MembershipResult, ClassroomCreate, ClassroomUpdate
 from .db import SessionLocal, engine
 
 
@@ -91,6 +91,16 @@ async def get_classrooms(
     db: AsyncSession = Depends(get_db),
 ):
     return await crud.get_classroom(db, classroom_id)
+
+
+@app.patch("/classrooms/{classroom_id}")
+async def update_classrooms(
+    classroom_id: int,
+    classroom: ClassroomUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    print("update classroom")
+    return await crud.update_classroom(db, classroom_id, classroom)
 
 
 @app.post(

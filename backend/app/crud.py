@@ -29,6 +29,17 @@ async def get_classroom(db: AsyncSession, classroom_id: int):
     return classroom
 
 
+async def update_classroom(
+    db: AsyncSession, classroom_id: int, classroom: schemas.ClassroomUpdate
+):
+    classroom_db_obj = await get_classroom(db, classroom_id)
+    classroom_db_obj.name = classroom.name
+    classroom_db_obj.begin_date = classroom.begin_date
+    classroom_db_obj.end_date = classroom.end_date
+    classroom_db_obj.github_classroom_link = classroom.github_classroom_link
+    await db.commit()
+
+
 async def import_students_bb(
     db: AsyncSession, classroom_id: int, import_data: schemas.MembershipResult
 ):

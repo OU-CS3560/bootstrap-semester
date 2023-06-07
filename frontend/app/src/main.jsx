@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App.jsx";
-import ClassroomDetail from "./routes/ClassroomDetail.jsx";
+import ClassroomDetail, { action as updateClassroomAction} from "./routes/ClassroomDetail.jsx";
 import ClassroomList from "./routes/ClassroomList.jsx";
 import ClassroomCreate, { action as createClassroomAction } from "./routes/ClassroomCreate.jsx";
 import TeamDetail from "./routes/TeamDetail.jsx";
@@ -43,20 +43,21 @@ const router = createBrowserRouter([
   },
   {
     path: "/classrooms/new",
-    element: <ClassroomCreate />,
     action: createClassroomAction,
+    element: <ClassroomCreate />,
   },
   {
     path: "/classrooms/:classroomId",
     loader: classroomLoader,
+    action: updateClassroomAction,
     element: <ClassroomDetail />,
     errorElement: <ErrorPage />,
   },
   {
     path: "/classrooms/:classroomId/import/students-from-bb",
     loader: classroomLoader,
-    element: <ImportStudentsFromBlackboard />,
     action: importAction,
+    element: <ImportStudentsFromBlackboard />,
   },
   {
     path: "/classrooms/:classroomId/milestones/",
