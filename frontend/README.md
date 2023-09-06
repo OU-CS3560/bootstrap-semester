@@ -14,3 +14,7 @@ $ cd app
 $ npm install
 $ npm run dev
 ```
+
+vite will only listen to loop back address of IPv6 if it is available, so
+please use `http://[::1]:5173` if `http://localhost:5173` show error
+(e.g. unable to connect)

@@ -3,9 +3,13 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App.jsx";
-import ClassroomDetail, { action as updateClassroomAction} from "./routes/ClassroomDetail.jsx";
+import ClassroomDetail, {
+  action as updateClassroomAction,
+} from "./routes/ClassroomDetail.jsx";
 import ClassroomList from "./routes/ClassroomList.jsx";
-import ClassroomCreate, { action as createClassroomAction } from "./routes/ClassroomCreate.jsx";
+import ClassroomCreate, {
+  action as createClassroomAction,
+} from "./routes/ClassroomCreate.jsx";
 import TeamDetail from "./routes/TeamDetail.jsx";
 import ImportStudentsFromBlackboard, {
   action as importAction,
@@ -27,16 +31,11 @@ async function classroomLoader({ params }) {
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
-  },
-  {
     path: "/hello-world",
     element: <div>Hello world!</div>,
   },
   {
-    path: "/classrooms/",
+    path: "/",
     loader: classroomsLoader,
     element: <ClassroomList />,
     errorElement: <ErrorPage />,
