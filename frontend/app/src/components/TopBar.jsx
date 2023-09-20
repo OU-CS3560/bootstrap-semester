@@ -9,11 +9,13 @@ export default function TopBar() {
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Container>
-        <Navbar.Brand href="#home">Management</Navbar.Brand>
+        <Navbar.Brand href="/">Management</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to={`/classrooms/`}>Classrooms</Nav.Link>
+            <Nav.Link as={Link} to={`/`}>
+              Classrooms
+            </Nav.Link>
           </Nav>
           <Nav>
             <NavDropdown title="Account Dropdown" id="collasible-nav-dropdown">
@@ -21,9 +23,7 @@ export default function TopBar() {
               <NavDropdown.Item href="#"></NavDropdown.Item>
               <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="#logout">
-                Logout
-              </NavDropdown.Item>
+              <NavDropdown.Item href="#logout">Logout</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>
