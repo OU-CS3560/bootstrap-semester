@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.10
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --configFile=/etc/traefik/traefik.yml --providers.file.directory=/etc/traefik/dynamic.conf
+    ports:
+      # The HTTP port
+      - "80:80"
+      - "443:443"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./proxy:/etc/traefik
+    labels:
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.docker.localhost`, `traefik.daroka.kchusap.com`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$/7fbNsNF$b9LFWJHm04.riZF007OLO."
+
+  whoami:
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
+    profiles:
+      - debug
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"

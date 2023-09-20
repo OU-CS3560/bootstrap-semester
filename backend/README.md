@@ -44,7 +44,7 @@ $ sqlite3 filename
 > .q
 ```
 
-### Create database migration revision
+### Create a database migration revision
 
 Create a revision.
 

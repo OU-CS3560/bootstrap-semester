@@ -1,20 +1,20 @@
-version: '3.8'
+version: "3.8"
 
 x-common-variables: &common-variables
-  SQLALCHEMY_DATABASE_URL: "sqlite+aiosqlite:///./backend.db"
-  MYSQL_DATABASE: books
-  MYSQL_USER: MYSQL_USER
-  MYSQL_PASSWORD: MYSQL_PASSWORD
+  SQLALCHEMY_DATABASE_URL: $SQLALCHEMY_DATABASE_URL
 
 services:
-
   nginx:
     restart: always
     build:
       dockerfile: Dockerfile
       context: ./frontend
+      args:
+        vite_api_base_url: $VITE_API_BASE_URL
     ports:
-      - "80:80"
+      - "3000:80"
+    labels:
+      - "traefik.http.routers.frontend.rule=Host(`mngt.docker.localhost`,`mngt.daroka.kchusap.com`)"
 
   api:
     build:
@@ -24,3 +24,5 @@ services:
       - "3001:80"
     environment:
       <<: *common-variables
+    labels:
+      - "traefik.http.routers.backend.rule=Host(`mngt.docker.localhost`,`mngt.daroka.kchusap.com`) && Path(`/api`)"

@@ -1,0 +1,15 @@
+accessLog: {}
+
+log:
+  level: DEBUG
+
+api:
+  # Dashboard
+  #
+  # Optional
+  # Default: true
+  #
+  dashboard: true
+
+providers:
+  docker: {}

@@ -1,4 +1,8 @@
-FROM node:20-alpine3.17 AS builder
+ARG vite_api_base_url
+
+FROM node:18-alpine3.17 AS builder
+ARG vite_api_base_url
+ENV VITE_API_BASE_URL=$vite_api_base_url
 WORKDIR /app
 COPY ./app/package.json ./
 COPY ./app/package-lock.json ./
