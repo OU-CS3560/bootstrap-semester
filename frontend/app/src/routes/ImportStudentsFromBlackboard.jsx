@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Form as RouterForm, redirect, useLoaderData } from "react-router-dom";
 
 import Container from "react-bootstrap/Container";
@@ -52,7 +52,7 @@ export default function ImportStudentsFromBlackboard() {
   let response;
   if (hasValidCourseId) {
     response = (
-      <>
+      <Fragment>
         <Row>
           <Col xs={3}>
             <p>
@@ -74,7 +74,7 @@ export default function ImportStudentsFromBlackboard() {
             </Form>
           </Col>
         </Row>
-      </>
+      </Fragment>
     );
   } else {
     response = (
