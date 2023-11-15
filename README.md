@@ -45,7 +45,9 @@ Create the `.env` file with the following content.
 
 ```plain
 VITE_API_BASE_URL=http://mngt.docker.localhost/api
-SQLALCHEMY_DATABASE_URL=sqlite+aiosqlite:///./backend.db
+#SQLALCHEMY_DATABASE_URL=sqlite+aiosqlite:///./backend.db
+SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://postgres:example@db/postgres"
+POSTGRES_PASSWORD=example
 ```
 
 Replace the domain name in `http://mngt.docker.localhost/api` with the domain of your choice.

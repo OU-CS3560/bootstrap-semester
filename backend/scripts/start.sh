@@ -1,10 +1,18 @@
 #!/bin/sh
+#
+# A script to start the API server from within a container.
+#
 
 # Wait for DB to be ready.
-python /code/app/wait_db.py
+python -m app.wait_db
 
-# Database migrations
-alembic upgrade head
+if [ $? -eq 1 ] 
+then
+    echo "wait_db.py exited with code 1. Database is not ready"
+else
+    # Database migrations
+    alembic upgrade head
 
-# Start the API server.
-uvicorn app.main:app --host 0.0.0.0 --port 80 --proxy-headers --root-path /api
+    # Start the API server.
+    uvicorn app.main:app --host 0.0.0.0 --port 80 --proxy-headers --root-path /api
+fi
