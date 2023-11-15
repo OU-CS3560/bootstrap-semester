@@ -8,7 +8,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          console.log(id);
           if (id.includes("react-router-dom") || id.includes("react-router")) {
             return '@react-router';
           } else if (id.includes("bootstrap") || id.includes("popperjs")) {
