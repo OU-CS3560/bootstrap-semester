@@ -22,7 +22,7 @@ You can then modify the password in the label of the traefik container in
 For example, here are the default accounts.
 
 ```yaml
-- "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$/7fbNsNF$b9LFWJHm04.riZF007OLO.,test2:$$apr1$$d9hr9HBB$$4HxwgUir3HP4EsggP/QNo0"
+- "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$/7fbNsNF$$b9LFWJHm04.riZF007OLO.,test2:$$apr1$$d9hr9HBB$$4HxwgUir3HP4EsggP/QNo0"
 ```
 
 which listed two accounts `test:test` and `test2:test2`.
@@ -68,7 +68,7 @@ deployment or [http://mngt.daroka.kchusap.com/](http://mngt.daroka.kchusap.com/)
 deployment.
 
 You can also visit [http://traefik.kchusap.com/dashboard/](http://traefik.kchusap.com/dashboard/)
-for the Traefik's dashboard.
+for the Traefik's dashboard. The URL must have slash at the end (`/`).
 
 ## Testing
 

@@ -18,7 +18,7 @@ export async function action({ request, params }) {
   if (response !== undefined) {
     return response;
   } else {
-    return redirect("/classrooms/");
+    return redirect(`/classrooms/${response.id}`);
   }
 }
 

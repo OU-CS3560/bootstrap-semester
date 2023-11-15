@@ -12,7 +12,7 @@ export async function createClassroom(data) {
         },
       });
     // Return nothing.
-    return;
+    return response;
   } catch (error) {
     console.log(error);
 
