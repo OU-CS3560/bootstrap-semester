@@ -3,4 +3,4 @@
 set -e
 set -x
 
-pytest app/tests "${@}"
+python -m pytest app/tests "${@}"

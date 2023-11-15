@@ -102,6 +102,13 @@ async def update_classrooms(
     print("update classroom")
     return await crud.update_classroom(db, classroom_id, classroom)
 
+@app.delete("/classrooms/{classroom_id}")
+async def delete_classroom(
+    classroom_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    return await crud.delete_classroom(db, classroom_id)
+
 
 @app.post(
     "/classrooms/{classroom_id}/import/students-from-bb",

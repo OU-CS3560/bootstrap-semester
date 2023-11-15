@@ -20,6 +20,18 @@ To unset the variable use the `unset NAME` command.
 $ rm -f test.db; ./scripts/test.sh
 ```
 
+If you want to test the containerized version, build the image with the following command
+
+```console
+$ docker compose build --build-arg INCLUDE_DEV_DEPS=1 api
+```
+
+Then you can run pytest in the container.
+
+```console
+$ docker run --rm -it --entrypoint /code/scripts/test.sh mngt-api
+```
+
 ## Note
 
 ### Endpoint Testing Commands

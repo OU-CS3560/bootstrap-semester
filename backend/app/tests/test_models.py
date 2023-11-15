@@ -7,7 +7,7 @@ does not deal with the app's endpoints.
 from datetime import datetime
 
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select, func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -63,6 +63,40 @@ class TestClassroom:
                 )
                 session.add(c)
                 session.commit()
+
+    def test_deletion(self, in_memory_engine_with_tables, a_classroom):
+        with Session(in_memory_engine_with_tables) as session:
+            session.add(a_classroom)
+            session.commit()
+
+            # Minimal student creation.
+            # without github username and team
+            s = Student(
+                first_name="Bob",
+                last_name="Cat",
+                username="bobcat",
+                classroom=a_classroom,
+            )
+            session.add(s)
+            session.commit()
+
+            s = Student(
+                first_name="Bob",
+                last_name="Cat",
+                username="bobcat",
+                github_username="bobcat",
+                classroom=a_classroom,
+            )
+            session.add(s)
+            session.commit()
+
+            # Delete the classroom.
+            session.delete(a_classroom)
+            session.commit()
+
+            # The two student objects should also be deleted.
+            result = session.execute(select(func.count()).select_from(Student))
+            assert result.one()[0] == 0
 
 
 class TestStudentModel:

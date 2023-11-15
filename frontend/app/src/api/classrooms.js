@@ -11,7 +11,6 @@ export async function createClassroom(data) {
           "Content-Type": "application/json",
         },
       });
-    // Return nothing.
     return response;
   } catch (error) {
     console.log(error);
