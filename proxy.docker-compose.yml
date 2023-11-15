@@ -15,7 +15,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./proxy:/etc/traefik
     labels:
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.docker.localhost`, `traefik.daroka.kchusap.com`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.docker.localhost`, `traefik.kchusap.com`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.middlewares=auth"
       - "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$/7fbNsNF$b9LFWJHm04.riZF007OLO."

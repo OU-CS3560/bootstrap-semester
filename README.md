@@ -67,7 +67,7 @@ you can then visit [http://mngt.docker.localhost/](http://mngt.docker.localhost/
 deployment or [http://mngt.daroka.kchusap.com/](http://mngt.daroka.kchusap.com/) for a production
 deployment.
 
-You can also visit [http://traefik.daroka.kchusap.com/dashboard/](http://traefik.daroka.kchusap.com/dashboard/)
+You can also visit [http://traefik.kchusap.com/dashboard/](http://traefik.kchusap.com/dashboard/)
 for the Traefik's dashboard.
 
 ## Testing

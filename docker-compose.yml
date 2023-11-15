@@ -14,7 +14,7 @@ services:
     ports:
       - "3000:80"
     labels:
-      - "traefik.http.routers.frontend.rule=Host(`mngt.docker.localhost`,`mngt.daroka.kchusap.com`)"
+      - "traefik.http.routers.frontend.rule=Host(`mngt.docker.localhost`,`mngt.daroka.kchusap.com`, `cs3560.kchusap.com`)"
 
   api:
     build:
@@ -25,7 +25,7 @@ services:
     environment:
       <<: *common-variables
     labels:
-      - "traefik.http.routers.backend.rule=Host(`mngt.docker.localhost`,`mngt.daroka.kchusap.com`) && Path(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`mngt.docker.localhost`,`mngt.daroka.kchusap.com`, `cs3560.kchusap.com`) && Path(`/api`)"
     depends_on:
       - "db"
 
