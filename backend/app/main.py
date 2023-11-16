@@ -2,7 +2,8 @@ from typing import Union
 
 from fastapi import FastAPI, Depends, status, Request, HTTPException
 from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound
 
@@ -19,8 +20,6 @@ async def get_db() -> AsyncSession:
     finally:
         await db.close()
 
-
-app = FastAPI()
 # During the development mode, the fronetend is served by
 # vite on port 5173. It also seems to prioritize
 # the IPv6 on a machine that has it.
@@ -32,14 +31,19 @@ origins = [
     "http://127.0.0.1:5173",
     "http://[::1]:5173",
 ]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex="https://*\.app\.github\.dev",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_origin_regex="http[s]:\/\/.*\.app\.github\.dev",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+]
+
+app = FastAPI(middleware=middleware)
+
 
 
 @app.on_event("startup")
