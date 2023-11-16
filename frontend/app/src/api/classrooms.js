@@ -27,12 +27,9 @@ export async function createClassroom(data) {
 }
 
 export async function getClassrooms() {
-  try {
-    const response = await axios.get(`${apiBaseURL}/classrooms/`);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  // Error is handled by the Route.
+  const response = await axios.get(`${apiBaseURL}/classrooms/`);
+  return response.data;
 }
 
 export async function getClassroom(id) {

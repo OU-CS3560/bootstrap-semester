@@ -37,13 +37,15 @@ export default function ClassroomBasicInfoPanel({ classroom }) {
               Begin: {new Date(classroom.begin_date).toDateString()} End:{" "}
               {new Date(classroom.end_date).toDateString()}
             </p>
-            <a
+            {classroom.github_classroom_link ? 
+            (<a
               href={classroom.github_classroom_link}
               target="_blank"
               rel="noreferrer"
             >
               GitHub Classroom
-            </a>
+            </a>) : <></>
+            }
           </Col>
         </Row>
         <Row className="mb-3">
