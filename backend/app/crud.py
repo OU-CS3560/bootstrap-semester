@@ -42,7 +42,7 @@ async def update_classroom(
 
 async def delete_classroom(db: AsyncSession, classroom_id: int):
     classroom_db_obj = await get_classroom(db, classroom_id)
-    db.delete(classroom_db_obj)
+    await db.delete(classroom_db_obj)
     await db.commit()
 
 

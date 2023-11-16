@@ -135,6 +135,17 @@ class TestClassroomCRUD:
         assert obj["id"] == 1
         assert obj == classroom_api_data
 
+    def test_delete(self, context, classroom_create_data):
+        client, _, _ = context
+
+        # Create the object to perform get later.
+        response = client.post("/classrooms/", json=classroom_create_data)
+        classroom_id = response.json()["id"]
+
+        # Test.
+        response = client.delete(f"/classrooms/{classroom_id}")
+        assert response.status_code == status.HTTP_200_OK
+
     def test_get_not_exist(self, context):
         client, _, _ = context
         response = client.get(f"/classrooms/1")
