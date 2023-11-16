@@ -15,6 +15,9 @@ import ImportStudentsFromBlackboard, {
 } from "./routes/ImportStudentsFromBlackboard.jsx";
 import MilestoneDetail from "./routes/MilestoneDetail.jsx";
 import ErrorPage from "./ErrorPage.jsx";
+import StudentList, {
+  loader as studentListLoader,
+} from "./routes/StudentList.jsx";
 
 import { getClassrooms, getClassroom } from "./api/classrooms.js";
 
@@ -87,13 +90,9 @@ const router = createBrowserRouter([
   },
   {
     path: "/classrooms/:classroomId/students",
-    element: (
-      <div>
-        Student list + pagination + tool: fuzzy search (email handle,
-        username(s)) + tool: add/import + tool: edit + tool: delete + tool:
-        username checker
-      </div>
-    ),
+    element: <StudentList />,
+    loader: studentListLoader,
+    errorElement: <ErrorPage />,
   },
 ]);
 
