@@ -10,7 +10,10 @@ if [ $? -eq 1 ]
 then
     echo "wait_db.py exited with code 1. Database is not ready"
 else
-    # Database migrations
+    # Create all tables if the database is empty.
+    python -m app.db
+
+    # Run database schema migrations (if any).
     alembic upgrade head
 
     # Start the API server.
