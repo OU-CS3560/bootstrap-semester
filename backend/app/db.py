@@ -36,6 +36,7 @@ async def create_tables_if_not_exist():
             print("[db]: database has no tables. Assume an empty database and will be creating all tables")
             # create_all() does not work in async.
             await conn.run_sync(Base.metadata.create_all)
+            await conn.commit()
         else:
             print("[db]: database is not empty. skipping tables creation")
 
