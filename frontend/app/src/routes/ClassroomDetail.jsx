@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useActionData } from "react-router-dom";
+import { Link, useLoaderData, redirect, useActionData } from "react-router-dom";
 
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -6,17 +6,27 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
 
-import { updateClassroom } from "../api/classrooms";
+import { updateClassroom, deleteClassroom } from "../api/classrooms";
 import TopBar from "../components/TopBar";
 import ClassroomBasicInfoPanel from "../components/ClassroomBasicInfoPanel";
 
+// This action is used in <ClassroomBasicInfoPanel />
 export async function action({ request, params }) {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData);
-  const response = await updateClassroom(
-    params.classroomId,
-    data);
-  return response;
+  switch (request.method) {
+    case "PATCH": {
+      const formData = await request.formData();
+      const payload = Object.fromEntries(formData);
+      const result = await updateClassroom(params.classroomId, payload);
+      return result;
+    }
+    case "DELETE": {
+      await deleteClassroom(params.classroomId);
+      return redirect("/");
+    }
+    default: {
+      throw new Response("", { status: 405 });
+    }
+  }
 }
 
 export default function ClassroomDetail() {
@@ -65,7 +75,8 @@ export default function ClassroomDetail() {
             </Link>
             <ul>
               <li>
-                Maybe only show the active milestone? (or with up-coming as well)
+                Maybe only show the active milestone? (or with up-coming as
+                well)
               </li>
             </ul>
           </Col>
@@ -93,5 +104,6 @@ export default function ClassroomDetail() {
           </Col>
         </Row>
       </Container>
-    </>);
+    </>
+  );
 }

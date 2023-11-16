@@ -12,13 +12,13 @@ import TopBar from "../components/TopBar";
 export async function action({ request, params }) {
   console.log("performing action");
   const formData = await request.formData();
-  const data = Object.fromEntries(formData);
-  const response = await createClassroom(data);
+  const payload = Object.fromEntries(formData);
+  const { status, data } = await createClassroom(payload);
 
-  if (response !== undefined) {
-    return response;
-  } else {
-    return redirect(`/classrooms/${response.id}`);
+  if (status === "success") {
+    return redirect(`/classrooms/${data.id}`);
+  } else if (status === "error") {
+    return data;
   }
 }
 

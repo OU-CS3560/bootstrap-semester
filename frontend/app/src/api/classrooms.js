@@ -11,7 +11,12 @@ export async function createClassroom(data) {
           "Content-Type": "application/json",
         },
       });
-    return response;
+
+    console.log(response);
+    return {
+      "status": "success",
+      "data": response.data,
+    };
   } catch (error) {
     console.log(error);
 
@@ -21,7 +26,10 @@ export async function createClassroom(data) {
       error.response.data.detail.map((e, i) => {
         errors[e.loc[1]] = e.msg;
       });
-      return errors;
+      return {
+        "status": "error",
+        "data": errors,
+      };
     }
   }
 }
@@ -41,6 +49,11 @@ export async function getClassroom(id) {
   }
 }
 
+export async function deleteClassroom(id) {
+  const response = await axios.delete(`${apiBaseURL}/classrooms/${id}`);
+  return response.data;
+}
+
 export async function updateClassroom(id, classroom) {
   try {
     const response = await axios.patch(`${apiBaseURL}/classrooms/${id}`, classroom, {
@@ -48,7 +61,10 @@ export async function updateClassroom(id, classroom) {
         "Content-Type": "application/json",
       }
     });
-    return response.data;
+    return {
+      "status": "success",
+      "data": response.data,
+    };
   } catch (error) {
     console.log(error);
 
@@ -60,7 +76,10 @@ export async function updateClassroom(id, classroom) {
       error.response.data.detail.map((e, i) => {
         errors[e.loc[1]] = e.msg;
       });
-      return errors;
+      return {
+        "status": "error",
+        "data": errors,
+      };
     }
   }
 }
