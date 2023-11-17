@@ -16,6 +16,9 @@ class User(Base):
     __tablename__ = "user"
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(256))
+    full_name: Mapped[str] = mapped_column(String(256))
+    hashed_password: Mapped[str] = mapped_column(String(1024))
+    disabled: Mapped[bool] = mapped_column(Boolean())
 
 
 class Classroom(Base):

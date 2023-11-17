@@ -1,7 +1,8 @@
-from typing import Union
+from typing import Annotated, Union
 
 from fastapi import FastAPI, Depends, status, Request, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,8 +10,9 @@ from sqlalchemy.exc import NoResultFound
 
 from . import crud
 from .config import settings
-from .schemas import MembershipResult, ClassroomCreate, ClassroomUpdate
+from .schemas import MembershipResult, ClassroomCreate, ClassroomUpdate, User, UserInDB
 from .db import SessionLocal, engine
+from .auth import oauth2_scheme, get_current_active_user, fake_users_db, fake_hash_password
 
 
 async def get_db() -> AsyncSession:
@@ -41,9 +43,7 @@ middleware = [
         allow_headers=["*"],
     )
 ]
-
 app = FastAPI(middleware=middleware)
-
 
 
 @app.on_event("startup")
@@ -66,9 +66,27 @@ async def no_result_found_exception_handler(request: Request, exec: NoResultFoun
 
 
 @app.get("/")
-async def read_root():
-    return {"hello": "world"}
+async def read_root(token: Annotated[str, Depends(oauth2_scheme)]):
+    return {"msg": "hello world", "token": token}
 
+
+@app.get("/users/me")
+async def read_users_me(current_user: Annotated[User, Depends(get_current_active_user)]):
+    return current_user
+
+
+@app.post("/token")
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    user_dict = fake_users_db.get(form_data.username)
+    if not user_dict:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    user = UserInDB(**user_dict)
+    hashed_password = fake_hash_password(form_data.password)
+    print(user, hashed_password)
+    if not hashed_password == user.hashed_password:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+
+    return {"access_token": user.username, "token_type": "bearer"}
 
 @app.get("/items/{item_id}")
 async def read_item(item_id: int, q: Union[str, None]):
