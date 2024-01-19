@@ -33,11 +33,16 @@ async def update_classroom(
     db: AsyncSession, classroom_id: int, classroom: schemas.ClassroomUpdate
 ):
     classroom_db_obj = await get_classroom(db, classroom_id)
-    classroom_db_obj.name = classroom.name
-    classroom_db_obj.begin_date = classroom.begin_date
-    classroom_db_obj.end_date = classroom.end_date
-    classroom_db_obj.github_classroom_link = classroom.github_classroom_link
+    if classroom.name is not None:
+        classroom_db_obj.name = classroom.name
+    if classroom.begin_date is not None:
+        classroom_db_obj.begin_date = classroom.begin_date
+    if classroom.end_date is not None:
+        classroom_db_obj.end_date = classroom.end_date
+    if classroom.github_classroom_link is not None:
+        classroom_db_obj.github_classroom_link = classroom.github_classroom_link
     await db.commit()
+    return classroom_db_obj
 
 
 async def delete_classroom(db: AsyncSession, classroom_id: int):

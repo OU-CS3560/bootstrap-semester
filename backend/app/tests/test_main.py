@@ -8,7 +8,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 import pytest
 
+SECRET_KEY = "super-secret-key"
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+
+os.environ["SECRET_KEY"] = SECRET_KEY
 os.environ["SQLALCHEMY_DATABASE_URL"] = SQLALCHEMY_DATABASE_URL
 
 from .. import models
@@ -84,76 +87,122 @@ def classroom_api_data():
     }
 
 
-def test_get_index(context):
+@pytest.fixture
+def logged_in_token(context):
     client, _, _ = context
-    response = client.get("/")
+    # TODO: Create user in the database.
+
+    # Log in with the username and password.
+    response = client.post(
+        "/token",
+        data={
+            "username": "johndoe",
+            "password": "secret",
+        },
+    )
+    token = response.json()
+    yield token["access_token"]
+    # Cleaning if needed.
+
+
+def test_get_index(context, logged_in_token):
+    client, _, _ = context
+    response = client.get("/", headers={"Authorization": "Bearer " + logged_in_token})
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"hello": "world"}
+    assert response.json() == {"msg": "hello world"}
 
 
 class TestClassroomCRUD:
-    def test_list_empty(self, context):
+    def test_list_empty(self, context, logged_in_token):
         client, _, _ = context
-        response = client.get("/classrooms/")
+        response = client.get(
+            "/classrooms/", headers={"Authorization": "Bearer " + logged_in_token}
+        )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
 
-    def test_list(self, context, classroom_create_data, classroom_api_data):
+    def test_list(
+        self, context, classroom_create_data, classroom_api_data, logged_in_token
+    ):
         client, _, _ = context
         response = client.post(
             "/classrooms/",
             json=classroom_create_data,
+            headers={"Authorization": "Bearer " + logged_in_token},
         )
         assert response.status_code == status.HTTP_201_CREATED
 
-        response = client.get("/classrooms/")
+        response = client.get(
+            "/classrooms/", headers={"Authorization": "Bearer " + logged_in_token}
+        )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [classroom_api_data]
 
-    def test_create(self, context, classroom_create_data, classroom_api_data):
+    def test_create(
+        self, context, classroom_create_data, classroom_api_data, logged_in_token
+    ):
         client, _, _ = context
         response = client.post(
             "/classrooms/",
             json=classroom_create_data,
+            headers={"Authorization": "Bearer " + logged_in_token},
         )
         print(response.json())
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == classroom_api_data
 
-    def test_get(self, context, classroom_create_data, classroom_api_data):
+    def test_get(
+        self, context, classroom_create_data, classroom_api_data, logged_in_token
+    ):
         client, _, _ = context
 
         # Create the object to perform get later.
-        response = client.post("/classrooms/", json=classroom_create_data)
+        response = client.post(
+            "/classrooms/",
+            json=classroom_create_data,
+            headers={"Authorization": "Bearer " + logged_in_token},
+        )
         classroom_id = response.json()["id"]
 
         # Test.
-        response = client.get(f"/classrooms/{classroom_id}")
+        response = client.get(
+            f"/classrooms/{classroom_id}",
+            headers={"Authorization": "Bearer " + logged_in_token},
+        )
         assert response.status_code == status.HTTP_200_OK
         obj = response.json()
         assert obj["id"] == 1
         assert obj == classroom_api_data
 
-    def test_delete(self, context, classroom_create_data):
+    def test_delete(self, context, classroom_create_data, logged_in_token):
         client, _, _ = context
 
         # Create the object to perform get later.
-        response = client.post("/classrooms/", json=classroom_create_data)
+        response = client.post(
+            "/classrooms/",
+            json=classroom_create_data,
+            headers={"Authorization": "Bearer " + logged_in_token},
+        )
         classroom_id = response.json()["id"]
 
         # Test.
-        response = client.delete(f"/classrooms/{classroom_id}")
+        response = client.delete(
+            f"/classrooms/{classroom_id}",
+            headers={"Authorization": "Bearer " + logged_in_token},
+        )
         assert response.status_code == status.HTTP_200_OK
 
-    def test_get_not_exist(self, context):
+    def test_get_not_exist(self, context, logged_in_token):
         client, _, _ = context
-        response = client.get(f"/classrooms/1")
+        response = client.get(
+            f"/classrooms/1", headers={"Authorization": "Bearer " + logged_in_token}
+        )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.anyio
     async def test_import_bb_students(
-        self, anyio_backend, context, classroom_create_data
+        self, anyio_backend, context, classroom_create_data, logged_in_token
     ):
         client, _, TestingSessionLocal = context
 
@@ -161,12 +210,14 @@ class TestClassroomCRUD:
         response = client.post(
             "/classrooms/",
             json=classroom_create_data,
+            headers={"Authorization": "Bearer " + logged_in_token},
         )
         classroom_id = response.json()["id"]
 
         # Import the students.
         response = client.post(
             f"/classrooms/{classroom_id}/import/students-from-bb",
+            headers={"Authorization": "Bearer " + logged_in_token},
             json={
                 "results": [
                     {
@@ -266,15 +317,21 @@ class TestClassroomCRUD:
 
 
 class TestStudentCRUD:
-    def test_get_students_not_exist(self, context):
+    def test_get_students_not_exist(self, context, logged_in_token):
         client, _, _ = context
 
-        response = client.get("/classrooms/1/students/1")
+        response = client.get(
+            "/classrooms/1/students/1",
+            headers={"Authorization": "Bearer " + logged_in_token},
+        )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_list_students_not_exist(self, context):
+    def test_list_students_not_exist(self, context, logged_in_token):
         client, _, _ = context
 
-        response = client.get("/classrooms/1/students")
+        response = client.get(
+            "/classrooms/1/students",
+            headers={"Authorization": "Bearer " + logged_in_token},
+        )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == list()

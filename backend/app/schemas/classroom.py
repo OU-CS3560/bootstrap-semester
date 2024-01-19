@@ -28,9 +28,9 @@ class ClassroomCreate(ClassroomBase):
 
 
 class ClassroomUpdate(ClassroomBase):
-    name: str
-    begin_date: date
-    end_date: date
+    name: Optional[str] = None
+    begin_date: Optional[date] = None
+    end_date: Optional[date] = None
     github_classroom_link: Optional[HttpUrl] = None
 
     @validator("github_classroom_link", pre=True, always=False)
@@ -46,7 +46,7 @@ class ClassroomInDBBase(ClassroomBase):
     github_classroom_link: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Additional properties to return via API.
