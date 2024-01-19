@@ -45,8 +45,7 @@ class ClassroomInDBBase(ClassroomBase):
     id: int
     github_classroom_link: str
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 # Additional properties to return via API.

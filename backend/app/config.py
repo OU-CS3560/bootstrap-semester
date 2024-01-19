@@ -6,9 +6,7 @@ class Settings(BaseSettings):
     secret_key: str
     access_token_expire_minutes: int = 30
 
-    class Config:
-        env_prefix = ""
-        case_sensitive = False
+    model_config = {"env_prefix": "", "case_sensitive": False}
 
 
 settings = Settings()

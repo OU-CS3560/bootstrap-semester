@@ -7,7 +7,7 @@ from . import models
 
 
 async def create_classroom(db: AsyncSession, classroom: schemas.ClassroomCreate):
-    classroom_data = classroom.dict()
+    classroom_data = classroom.model_dump()
     db_obj = models.Classroom(**classroom_data)
     db.add(db_obj)
     await db.commit()
