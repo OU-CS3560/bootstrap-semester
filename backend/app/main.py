@@ -1,25 +1,25 @@
-from typing import Annotated, Union
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
+from typing import Annotated, Union
 
-from fastapi import FastAPI, Depends, status, Request, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import NoResultFound
 
-from . import crud
-from .config import settings
-from . import schemas
-from .db import SessionLocal, engine
+from . import crud, schemas
 from .auth import (
-    oauth2_scheme,
-    get_current_active_user,
-    create_access_token,
     authenticate_user,
+    create_access_token,
     fake_users_db,
+    get_current_active_user,
+    oauth2_scheme,
 )
+from .config import settings
+from .db import SessionLocal, engine
 
 
 async def get_db() -> AsyncSession:
@@ -28,6 +28,12 @@ async def get_db() -> AsyncSession:
         yield db
     finally:
         await db.close()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await engine.dispose()
 
 
 # During the development mode, the fronetend is served by
@@ -45,23 +51,13 @@ middleware = [
     Middleware(
         CORSMiddleware,
         allow_origins=origins,
-        allow_origin_regex="http[s]:\/\/.*\.app\.github\.dev",
+        allow_origin_regex="http[s]://.*\.app\.github\.dev",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 ]
-app = FastAPI(middleware=middleware)
-
-
-@app.on_event("startup")
-async def startup():
-    pass
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await engine.dispose()
+app = FastAPI(middleware=middleware, lifespan=lifespan)
 
 
 @app.exception_handler(NoResultFound)

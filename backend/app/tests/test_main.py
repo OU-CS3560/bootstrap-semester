@@ -1,12 +1,11 @@
 import os
+from contextlib import asynccontextmanager
 
-from fastapi import status
+import pytest
+from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.asyncio import async_sessionmaker
-from sqlalchemy.ext.asyncio import AsyncSession
-import pytest
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 SECRET_KEY = "super-secret-key"
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -36,11 +35,15 @@ def context():
         bind=engine, autocommit=False, autoflush=False, expire_on_commit=False
     )
 
-    # Overriding startup event listener.
-    @app.on_event("startup")
-    async def tables_creation():
+    # Overriding the lifespan handler.
+    @asynccontextmanager
+    async def override_lifespan(app: FastAPI):
         async with engine.begin() as conn:
             await conn.run_sync(models.Base.metadata.create_all)
+        yield
+        await engine.dispose()
+
+    app.router.lifespan_context = override_lifespan
 
     async def override_get_db() -> AsyncSession:
         """
@@ -63,8 +66,7 @@ def context():
         yield client, engine, TestingSessionLocal
     finally:
         client.__exit__()
-        # engine.dispose() will be called by shutdown event
-        # listener.
+        # engine.dispose() will be called by the lifespan handler.
 
 
 @pytest.fixture
