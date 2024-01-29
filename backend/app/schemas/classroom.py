@@ -26,8 +26,10 @@ class ClassroomBase(BaseModel):
 
 
 class ClassroomCreate(ClassroomBase):
-    github_classroom_link: Optional[
-        Annotated[HttpUrl, BeforeValidator(check_github_classroom_link)]
+    github_classroom_link: Annotated[
+        Optional[HttpUrl],
+        BeforeValidator(check_github_classroom_link),
+        AfterValidator(lambda v: str(v) if v is not None else v),
     ] = None
 
 
@@ -35,8 +37,10 @@ class ClassroomUpdate(ClassroomBase):
     name: Optional[str] = None
     begin_date: Optional[date] = None
     end_date: Optional[date] = None
-    github_classroom_link: Optional[
-        Annotated[HttpUrl, BeforeValidator(check_github_classroom_link)]
+    github_classroom_link: Annotated[
+        Optional[HttpUrl],
+        BeforeValidator(check_github_classroom_link),
+        AfterValidator(lambda v: str(v) if v is not None else v),
     ] = None
 
 

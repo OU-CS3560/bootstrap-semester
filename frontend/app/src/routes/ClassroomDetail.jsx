@@ -1,14 +1,31 @@
-import { Link, useLoaderData, redirect, useActionData } from "react-router-dom";
+import { Link, redirect, useLoaderData } from "react-router-dom";
 
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import Badge from "react-bootstrap/Badge";
 
-import { updateClassroom, deleteClassroom } from "../api/classrooms";
-import TopBar from "../components/TopBar";
+import {
+  deleteClassroom,
+  getClassroom,
+  updateClassroom,
+} from "../api/classrooms";
 import ClassroomBasicInfoPanel from "../components/ClassroomBasicInfoPanel";
+import TopBar from "../components/TopBar";
+
+export async function loader({ params }) {
+  try {
+    const classroom = await getClassroom(params.classroomId);
+    return { classroom };
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      return redirect("/login");
+    } else {
+      throw error;
+    }
+  }
+}
 
 // This action is used in <ClassroomBasicInfoPanel />
 export async function action({ request, params }) {

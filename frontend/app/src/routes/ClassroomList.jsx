@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData, redirect } from "react-router-dom";
 
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -6,6 +6,20 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
 import TopBar from "../components/TopBar";
+import { getClassrooms } from "../api/classrooms";
+
+export async function loader() {
+  try {
+    const classrooms = await getClassrooms();
+    return { classrooms };
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      return redirect("/login");
+    } else {
+      throw error;
+    }
+  }
+}
 
 function ClassroomCard({ classroom }) {
   return (

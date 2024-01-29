@@ -32,7 +32,7 @@ export default function StudentList() {
           <Col>
             <h1>
               <Link to={`/classrooms/${classroom.id}`}>{classroom.name}</Link>{" "}
-              -> Student List
+              -&nbgt; Student List
             </h1>
           </Col>
         </Row>

@@ -1,35 +1,43 @@
+import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import ClassroomDetail, {
-  action as updateClassroomAction,
-} from "./routes/ClassroomDetail.jsx";
-import ClassroomList from "./routes/ClassroomList.jsx";
+import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
+import ErrorPage from "./ErrorPage.jsx";
 import ClassroomCreate, {
   action as createClassroomAction,
 } from "./routes/ClassroomCreate.jsx";
-import TeamDetail from "./routes/TeamDetail.jsx";
+import ClassroomDetail, {
+  loader as classroomLoader,
+  action as updateClassroomAction,
+} from "./routes/ClassroomDetail.jsx";
+import ClassroomList, {
+  loader as classroomsLoader,
+} from "./routes/ClassroomList.jsx";
 import ImportStudentsFromBlackboard, {
   action as importAction,
 } from "./routes/ImportStudentsFromBlackboard.jsx";
+import LoginPage, { action as loginAction } from "./routes/LoginPage.jsx";
 import MilestoneDetail from "./routes/MilestoneDetail.jsx";
-import ErrorPage from "./ErrorPage.jsx";
 import StudentList, {
   loader as studentListLoader,
 } from "./routes/StudentList.jsx";
+import TeamDetail from "./routes/TeamDetail.jsx";
+import axios from "axios";
 
-import { getClassrooms, getClassroom } from "./api/classrooms.js";
+axios.interceptors.request.use(function (config) {
+  if (!config.url.endsWith("/token")) {
+    const accessToken = JSON.parse(window.localStorage.getItem("access_token"));
+    if (!accessToken) {
+      throw { response: { status: 401 } };
+    }
 
-async function classroomsLoader() {
-  const classrooms = await getClassrooms();
-  return { classrooms };
-}
-
-async function classroomLoader({ params }) {
-  const classroom = await getClassroom(params.classroomId);
-  return { classroom };
-}
+    config.headers[
+      "Authorization"
+    ] = `${accessToken["token_type"]} ${accessToken["access_token"]}`;
+  }
+  return config;
+});
 
 const router = createBrowserRouter([
   {
@@ -39,26 +47,48 @@ const router = createBrowserRouter([
   {
     path: "/",
     loader: classroomsLoader,
-    element: <ClassroomList />,
+    element: (
+      <ProtectedRoute>
+        <ClassroomList />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/login",
+    action: loginAction,
+    element: <LoginPage></LoginPage>,
     errorElement: <ErrorPage />,
   },
   {
     path: "/classrooms/new",
     action: createClassroomAction,
-    element: <ClassroomCreate />,
+    element: (
+      <ProtectedRoute>
+        <ClassroomCreate />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/classrooms/:classroomId",
     loader: classroomLoader,
     action: updateClassroomAction,
-    element: <ClassroomDetail />,
+    element: (
+      <ProtectedRoute>
+        <ClassroomDetail />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorPage />,
   },
   {
     path: "/classrooms/:classroomId/import/students-from-bb",
     loader: classroomLoader,
     action: importAction,
-    element: <ImportStudentsFromBlackboard />,
+    element: (
+      <ProtectedRoute>
+        <ImportStudentsFromBlackboard />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/classrooms/:classroomId/milestones/",

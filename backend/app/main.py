@@ -43,9 +43,11 @@ origins = [
     "http://localhost",
     "http://127.0.0.1",
     "http://[::1]",
+    "http://[::]",
     "http://loclhost:5173",
     "http://127.0.0.1:5173",
     "http://[::1]:5173",
+    "http://[::]:5173",
 ]
 middleware = [
     Middleware(

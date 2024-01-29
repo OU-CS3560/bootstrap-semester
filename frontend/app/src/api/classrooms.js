@@ -2,24 +2,15 @@ import axios from "axios";
 
 const apiBaseURL = import.meta.env.VITE_API_BASE_URL;
 
-
 export async function createClassroom(data) {
   try {
-    const response = await axios.post(`${apiBaseURL}/classrooms/`, data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    const response = await axios.post(`${apiBaseURL}/classrooms/`, data);
 
-    console.log(response);
     return {
-      "status": "success",
-      "data": response.data,
+      status: "success",
+      data: response.data,
     };
   } catch (error) {
-    console.log(error);
-
     // Convert openapi format to form validation format.
     if (error.response && error.response.status === 422) {
       let errors = {};
@@ -27,8 +18,8 @@ export async function createClassroom(data) {
         errors[e.loc[1]] = e.msg;
       });
       return {
-        "status": "error",
-        "data": errors,
+        status: "error",
+        data: errors,
       };
     }
   }
@@ -56,14 +47,18 @@ export async function deleteClassroom(id) {
 
 export async function updateClassroom(id, classroom) {
   try {
-    const response = await axios.patch(`${apiBaseURL}/classrooms/${id}`, classroom, {
-      headers: {
-        "Content-Type": "application/json",
+    const response = await axios.patch(
+      `${apiBaseURL}/classrooms/${id}`,
+      classroom,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-    });
+    );
     return {
-      "status": "success",
-      "data": response.data,
+      status: "success",
+      data: response.data,
     };
   } catch (error) {
     console.log(error);
@@ -77,8 +72,8 @@ export async function updateClassroom(id, classroom) {
         errors[e.loc[1]] = e.msg;
       });
       return {
-        "status": "error",
-        "data": errors,
+        status: "error",
+        data: errors,
       };
     }
   }
@@ -103,4 +98,3 @@ export async function importStudentsFromBlackboard(
     console.log(error);
   }
 }
-
