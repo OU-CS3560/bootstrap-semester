@@ -1,18 +1,25 @@
+from contextlib import asynccontextmanager
+from datetime import datetime, timedelta, timezone
 from typing import Annotated, Union
 
-from fastapi import FastAPI, Depends, status, Request, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import NoResultFound
 
-from . import crud
+from . import crud, schemas
+from .auth import (
+    authenticate_user,
+    create_access_token,
+    fake_users_db,
+    get_current_active_user,
+    oauth2_scheme,
+)
 from .config import settings
-from .schemas import MembershipResult, ClassroomCreate, ClassroomUpdate, User, UserInDB
 from .db import SessionLocal, engine
-from .auth import oauth2_scheme, get_current_active_user, fake_users_db, fake_hash_password
 
 
 async def get_db() -> AsyncSession:
@@ -21,6 +28,13 @@ async def get_db() -> AsyncSession:
         yield db
     finally:
         await db.close()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await engine.dispose()
+
 
 # During the development mode, the fronetend is served by
 # vite on port 5173. It also seems to prioritize
@@ -37,23 +51,13 @@ middleware = [
     Middleware(
         CORSMiddleware,
         allow_origins=origins,
-        allow_origin_regex="http[s]:\/\/.*\.app\.github\.dev",
+        allow_origin_regex="http[s]://.*\.app\.github\.dev",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 ]
-app = FastAPI(middleware=middleware)
-
-
-@app.on_event("startup")
-async def startup():
-    pass
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await engine.dispose()
+app = FastAPI(middleware=middleware, lifespan=lifespan)
 
 
 @app.exception_handler(NoResultFound)
@@ -67,26 +71,33 @@ async def no_result_found_exception_handler(request: Request, exec: NoResultFoun
 
 @app.get("/")
 async def read_root(token: Annotated[str, Depends(oauth2_scheme)]):
-    return {"msg": "hello world", "token": token}
+    return {"msg": "hello world"}
 
 
 @app.get("/users/me")
-async def read_users_me(current_user: Annotated[User, Depends(get_current_active_user)]):
+async def read_users_me(
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)]
+):
     return current_user
 
 
 @app.post("/token")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    user_dict = fake_users_db.get(form_data.username)
-    if not user_dict:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    user = UserInDB(**user_dict)
-    hashed_password = fake_hash_password(form_data.password)
-    print(user, hashed_password)
-    if not hashed_password == user.hashed_password:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+) -> schemas.Token:
+    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return schemas.Token(access_token=access_token, token_type="bearer")
 
-    return {"access_token": user.username, "token_type": "bearer"}
 
 @app.get("/items/{item_id}")
 async def read_item(item_id: int, q: Union[str, None]):
@@ -95,23 +106,30 @@ async def read_item(item_id: int, q: Union[str, None]):
 
 @app.get("/classrooms/")
 async def get_classrooms(
-    skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db),
 ):
     return await crud.get_classrooms(db, skip, limit)
 
 
 @app.post("/classrooms/", status_code=status.HTTP_201_CREATED)
 async def create_classroom(
-    classroom: ClassroomCreate, db: AsyncSession = Depends(get_db)
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
+    classroom: schemas.ClassroomCreate,
+    db: AsyncSession = Depends(get_db),
 ):
     db_obj = await crud.create_classroom(db, classroom)
     return db_obj
 
 
 @app.get("/classrooms/{classroom_id}")
-async def get_classrooms(
+async def get_classroom_detail(
     classroom_id: int,
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
+    response_model=schemas.Classroom,
 ):
     return await crud.get_classroom(db, classroom_id)
 
@@ -119,15 +137,18 @@ async def get_classrooms(
 @app.patch("/classrooms/{classroom_id}")
 async def update_classrooms(
     classroom_id: int,
-    classroom: ClassroomUpdate,
+    classroom: schemas.ClassroomUpdate,
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ):
     print("update classroom")
     return await crud.update_classroom(db, classroom_id, classroom)
 
+
 @app.delete("/classrooms/{classroom_id}")
 async def delete_classroom(
     classroom_id: int,
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ):
     return await crud.delete_classroom(db, classroom_id)
@@ -139,7 +160,8 @@ async def delete_classroom(
 )
 async def import_students_from_bb(
     classroom_id: int,
-    membership_results: MembershipResult,
+    membership_results: schemas.MembershipResult,
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ):
     try:
@@ -155,6 +177,7 @@ async def import_students_from_bb(
 @app.get("/classrooms/{classroom_id}/students")
 async def get_students(
     classroom_id: int,
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ):
     return await crud.get_students(db, classroom_id)
@@ -164,6 +187,7 @@ async def get_students(
 async def get_student(
     classroom_id: int,
     student_id: int,
+    current_user: Annotated[schemas.User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ):
     return await crud.get_student(db, classroom_id, student_id)

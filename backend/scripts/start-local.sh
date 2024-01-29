@@ -4,7 +4,7 @@
 # This is meant to be a way to isolate the API server for debugging/testing.
 #
 
-export $(cat .env)
+export $(grep -v '^#' .env | xargs)
 
 # Create all tables if the database is empty.
 python -m app.db

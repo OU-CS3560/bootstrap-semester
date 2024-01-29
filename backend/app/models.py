@@ -30,7 +30,9 @@ class Classroom(Base):
     github_classroom_link: Mapped[Optional[str]] = mapped_column(String(2048))
 
     students: Mapped[list["Student"]] = relationship(cascade="delete, delete-orphan")
-    milestones: Mapped[list["Milestone"]] = relationship(cascade="delete, delete-orphan")
+    milestones: Mapped[list["Milestone"]] = relationship(
+        cascade="delete, delete-orphan"
+    )
     teams: Mapped[list["Team"]] = relationship(cascade="delete, delete-orphan")
 
 
